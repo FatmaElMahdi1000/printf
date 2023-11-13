@@ -35,7 +35,7 @@ int _printf(const char *format, ...)
 					count += fprintf(stdout, "%s", va_arg(list, char *));
 					break;
 				case '%':
-					count += fprintf(stdout, "%p", va_arg(list, void *));
+					count += fprintf(stdout, "%%", va_arg(list, void *));
 					break;
 				default:
 					putchar('%');
