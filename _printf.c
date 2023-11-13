@@ -1,54 +1,46 @@
 #include "main.h"
-#include <stdio.h>
-#include <stdarg.h>
-
 /**
- * _printf - prints anything
- * @format: string
- *
- * Return: no. of bytes
-*/
-
-int _printf(const char *format, ...)
+ * _printf - is a function that selects the correct function to print.
+ * @format: identifier to look for.
+ * Return: the length of the string.
+ */
+int _printf(const char * const format, ...)
 {
-	va_list list;
+	convert p[] = {
+		{"%s", print_s}, {"%c", print_c},
+		{"%%", print_37},
+		{"%i", print_i}, {"%d", print_d}, {"%r", print_revs},
+		{"%R", print_rot13}, {"%b", print_bin},
+		{"%u", print_unsigned},
+		{"%o", print_oct}, {"%x", print_hex}, {"%X", print_HEX},
+		{"%S", print_exc_string}, {"%p", print_pointer}
+	};
 
-	va_start(list, format);
+	va_list args;
+	int i = 0, j, length = 0;
 
-	int count = 0;
+	va_start(args, format);
+	if (format == NULL || (format[0] == '%' && format[1] == '\0'))
+		return (-1);
 
-	while (*format != '\0')
+Here:
+	while (format[i] != '\0')
 	{
-		if (*format != '%')
+		j = 13;
+		while (j >= 0)
 		{
-			putchar(*format);
-			count++;
-		}
-		else
-		{
-			switch (*++format)
+			if (p[j].ph[0] == format[i] && p[j].ph[1] == format[i + 1])
 			{
-				case 'c':
-					count += fprintf(stdout, "%c", va_arg(list, int));
-					break;
-				case 's':
-					count += fprintf(stdout, "%s", va_arg(list, char *));
-					break;
-				case '%':
-					count += fprintf(stdout, "%%", va_arg(list, void *));
-					break;
-				default:
-					putchar('%');
-					putchar(*format);
-					count += 2;
-					break;
-
+				length += p[j].function(args);
+				i = i + 2;
+				goto Here;
 			}
+			j--;
 		}
-		format++;
+		_putchar(format[i]);
+		length++;
+		i++;
 	}
-	va_end(list);
-	return (count);
-
-
+	va_end(args);
+	return (length);
 }
